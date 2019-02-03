@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>AgriFarm Server</title>
+
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+
+<section class='container'>
+  <hgroup>
+    <h1>AgriFarm Server (<%= dbInfo.remote ? 'production':'development' %>)</h1>
+  </hgroup>
+
+  <div class="row">
+    <section class='col-xs-12 col-sm-6 col-md-6'>
+      <section>
+        <h2>Feature:</h2>
+        <ul>
+          <li>Rest API - JWT Authentication</li>
+          <li>Sicket.io - Chat Server</li>
+        </ul>
+        <h2>Deploying code changes</h2>
+<pre>
+$ git clone https://github.com/davchezt/server-ex.git
+
+# navigate to project directory
+$ cd server-ex
+
+# Commit your changes and push
+$ git add .
+$ git commit -a -m 'Some commit message'
+$ git push origin master
+</pre>
+      </section>
+
+    </section>
+    <section class="col-xs-12 col-sm-6 col-md-6">
+      <h2>Request information</h2>
+      <p>Page view count:
+      <% if (pageCountMessage) { %>
+          <span class="code" id="count-value"><%=pageCountMessage%></span> (<a href="/pagecount" title="view json format">json</a>)
+          </p>
+          <div>
+            <h2>DB Connection Info:</h2>
+            <table class="code">
+              <tr><td>Type</td> <td>:</td> <td><%= dbInfo.type %></td></tr>
+              <tr><td>URL</td> <td>:</td> <td><%= dbInfo.url %></td></tr>
+              <tr><td>Remote</td> <td>:</td> <td><%= dbInfo.remote %></td></tr>
+            </table>
+          </div>
+      <% } else { %>
+          <span class="code" id="count-value">No database configured</span>
+          </p>
+      <%} %>
+    </section>
+  </div>
+
+  <footer>
+    
+  </footer>
+</section>
+</body>
+</html>

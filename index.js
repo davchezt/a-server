@@ -185,6 +185,21 @@ io.on("connection", (socket) => {
     io.sockets.in(data.room).emit("stop-typing", { room: data.room, user: data.form });
   });
   // END ROOM
+
+  // RTC
+  socket.on("start-call", (peer) => {
+    io.sockets.in(peer.room).emit("start-call", peer);
+  });
+  socket.on("in-call", (peer) => {
+    io.sockets.in(peer.room).emit("in-call");
+  });
+  socket.on("chat-call", (peer) => {
+    io.sockets.in(peer.room).emit("chat-call", peer);
+  });
+  socket.on("stop-call", (peer) => {
+    io.sockets.in(peer.room).emit("stop-call");
+  });
+  // END RTC
 });
 
 // Handle 404

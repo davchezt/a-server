@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require("mongoose");
 const multer = require('multer');
+const { google }  = require('googleapis');
+const FCM = require('fcm-node');
+const serverKey = require('../utils/agrifarm-app-firebase-adminsdk-gvvos-5460c59f59.json');
+const fcm = new FCM(serverKey);
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -30,6 +34,7 @@ const upload = multer({
 
 const Room = require('../models/room');
 const addFeed = require('../utils/notify');
+const api = require('../utils/request');
 
 // Belum ada agronomis
 router.get("/", (req, res, next) => {
@@ -287,5 +292,60 @@ router.get("/read/:roomId/:userId", (req, res, next) => {
   })
   .catch(err => { res.status(500).json({ error: err }); });
 });
+
+router.post("/push", (req, res, next) => {
+  console.log(req.body.token)
+  // Send push notification
+  const message = {
+      // to: req.body.token, // private
+      to: '/topics/videocall', // broadcast to videocall channels
+      // collapse_key: 'your_collapse_key',
+      // priority: 'notification',
+      // content_available: true,
+      notification: {
+        title: 'Title of your push notification',
+        body: 'Body of your push notification',
+        // image: "your_image_url",
+        sound: "default",
+        badge: "1"
+      },
+      data: {
+        userId: req.body.userId,
+        my_another_key: 'my another value'
+      }
+  }
+  fcm.send(message, (err, response) => {
+    if (err) {
+      console.log("Something has gone wrong!", err);
+      res.status(500).json({ error: err });
+    } else {
+      console.log("Successfully sent with response: ", response);
+      res.status(200).json({
+        message: "Success",
+        response: response
+      });
+    }
+  });
+});
+
+function getAccessToken() {
+  return new Promise((resolve, reject) => {
+    var key = require('../utils/agrifarm-app-firebase-adminsdk-gvvos-5460c59f59.json');
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      ['https://www.googleapis.com/auth/firebase.messaging'],
+      null
+    );
+    jwtClient.authorize((err, tokens) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(tokens.access_token);
+    });
+  });
+}
 
 module.exports = router;

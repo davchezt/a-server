@@ -33,18 +33,17 @@ module.exports = {
   post: (path, data, token) => {
     let postData = JSON.stringify(data);
     let options = {
-      hostname: 'localhost',
-      //port: 443,
+      hostname: 'fcm.googleapis.com',
+      port: 443,
       path: '/v1/' + path,
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Bearer ' + token,
         'Content-Length': postData.length
       }
     };
-    let req = http.request(options, (res) => {
+    let req = https.request(options, (res) => {
       console.log('statusCode:', res.statusCode);
       console.log('headers:', res.headers);
     

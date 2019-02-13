@@ -123,13 +123,7 @@ io.on("connection", (socket) => {
 
   // ROOM
   socket.on("subscribe", function(room) { // Create or join room
-    if (rooms.length === 0) {
-      rooms.push(room);
-    } else {
-      Object.keys(rooms).forEach(function() {
-        if (rooms.indexOf(room) === -1) rooms.push(room);
-      });
-    }
+    if (rooms.indexOf(room) === -1) rooms.push(room);
     io.sockets.in(room).emit("user", { room: room, event: "join" });
     socket.join(room);
   });
@@ -161,13 +155,7 @@ io.on("connection", (socket) => {
   // });
 
   socket.on('in-room', (data) => {
-    if (in_room.length === 0) {
-      in_room.push(data.userId);
-    } else {
-      Object.keys(in_room).forEach(function() {
-        if (in_room.indexOf(data.userId) === -1) in_room.push(data.userId);
-      });
-    }
+    if (in_room.indexOf(data.userId) === -1) in_room.push(data.userId);
     io.sockets.in(data.room).emit('in-room', { room: in_room, userId: data.userId });
   });
 
@@ -188,16 +176,42 @@ io.on("connection", (socket) => {
 
   // RTC
   socket.on("start-call", (peer) => {
+    console.log('start-call');
     io.sockets.in(peer.room).emit("start-call", peer);
   });
+  socket.on("reject-call", (peer) => {
+    console.log('reject-call');
+    io.sockets.in(peer.room).emit("reject-call");
+  });
   socket.on("in-call", (peer) => {
+    console.log('in-call');
     io.sockets.in(peer.room).emit("in-call");
   });
   socket.on("chat-call", (peer) => {
+    console.log('chat-call');
     io.sockets.in(peer.room).emit("chat-call", peer);
   });
   socket.on("stop-call", (peer) => {
+    console.log('stop-call');
     io.sockets.in(peer.room).emit("stop-call");
+  });
+
+  socket.on('join', function(room) {
+    var peers = io.nsps['/'].adapter.rooms[room] ? Object.keys(io.nsps['/'].adapter.rooms[room].sockets) : []
+    socket.emit('peers', peers);
+    socket.join(room);
+  });
+  socket.on('leave', function(room) {
+    // var peers = io.nsps['/'].adapter.rooms[room] ? Object.keys(io.nsps['/'].adapter.rooms[room].sockets) : []
+    // socket.emit('peers', peers);
+	  socket.leave(room);
+  });
+  socket.on('signal', function(data) {
+    var client = io.sockets.connected[data.id];
+    client && client.emit('signal', {
+      id: socket.id,
+      signal: data.signal,
+    });
   });
   // END RTC
 });
